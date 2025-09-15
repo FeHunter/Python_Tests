@@ -36,14 +36,19 @@ def BallMove():
         ball_dy *= -1
     # check player collision
     ball_radius = 5
-    if (ball_x + ball_radius >= 0 and
-        ball_x - ball_radius <= 0 + player1_width and
-        ball_y + ball_radius >= player1_y and
-        ball_y - ball_radius <= player1_y + 100):
-        hit_pos = (ball_y - player1_y) / 100
-        ball_dy = (hit_pos - 0.5) * 10
-        ball_dx = abs(ball_dx) * 1.1
-        score += 1
+    if (ball_x + ball_radius >= 0 and ball_x - ball_radius <= 0 + player1_width and
+        ball_y + ball_radius >= player1_y and ball_y - ball_radius <= player1_y + 100):
+            hit_pos = (ball_y - player1_y) / 100
+            ball_dy = (hit_pos - 0.5) * 10
+            ball_dx = abs(ball_dx) * 1.1
+            score += 1
+    
+    # check if hits the wall
+    if (ball_x <= player1_width - 10):
+        score = 0
+        ball_x, ball_y = SCREEN_WIDTH//2, SCREEN_HEIGHT//2
+        ball_dx = random.choice([-5, 5])
+        ball_dy = random.choice([-5, 5])
     canvas.coords(ball, ball_x, ball_y, ball_x + 30, ball_y + 30)
     window.after(30, BallMove)
 
