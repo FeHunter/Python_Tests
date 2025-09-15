@@ -1,9 +1,11 @@
 import tkinter as tk
 import random
+import save_high_score
 
 SCREEN_WIDTH = 500
 SCREEN_HEIGHT = 500
 score = 0
+high_score = save_high_score.ReadHighScore()
 player1_y = 100
 player1_width = 20
 ball_size = 130
@@ -25,7 +27,7 @@ def MoveDown(event):
     canvas.coords(player1, 0, player1_y, 20, player1_y + 100)
 
 def BallMove():
-    global ball_x, ball_y, ball_dx, ball_dy, player1_width, score
+    global ball_x, ball_y, ball_dx, ball_dy, player1_width, score, high_score
     # update ball pos
     ball_x += ball_dx
     ball_y += ball_dy
@@ -37,7 +39,7 @@ def BallMove():
     # check player collision
     ball_radius = 5
     if (ball_x + ball_radius >= 0 and ball_x - ball_radius <= 0 + player1_width and
-        ball_y + ball_radius >= player1_y and ball_y - ball_radius <= player1_y + 100):
+        ball_y + ball_radius >= player1_y and ball_y - ball_radius <= player1_y + 110):
             hit_pos = (ball_y - player1_y) / 100
             ball_dy = (hit_pos - 0.5) * 10
             ball_dx = abs(ball_dx) * 1.1
@@ -49,18 +51,24 @@ def BallMove():
         ball_x, ball_y = SCREEN_WIDTH//2, SCREEN_HEIGHT//2
         ball_dx = random.choice([-5, 5])
         ball_dy = random.choice([-5, 5])
+    # set High Score
+    if (score > high_score):
+        high_score = score
+        save_high_score.WriteHighScore(high_score)
     canvas.coords(ball, ball_x, ball_y, ball_x + 30, ball_y + 30)
     window.after(30, BallMove)
 
 def Score():
     global score
     canvas.itemconfig(scoreLabel, text=f"score: {score}")
+    canvas.itemconfig(high_scoreLabel, text=f"High Score: {high_score}")
     window.after(30, Score)
 
 # window settings
 window = tk.Tk()
 window.title("Tenis Game")
 window.geometry("500x500")
+window.resizable(False, False)
 
 # canvas
 canvas = tk.Canvas(window, width=SCREEN_WIDTH, height=SCREEN_HEIGHT, bg='white')
@@ -71,7 +79,8 @@ player1 = canvas.create_rectangle(0, player1_y, player1_width, player1_y + 100, 
 ball = canvas.create_oval(100, ball_size, ball_size, 100, fill='black')
 
 # Label - score
-scoreLabel = canvas.create_text(SCREEN_WIDTH/2, 20, text="0", font=("Arial", 20), fill="black")
+scoreLabel = canvas.create_text(SCREEN_WIDTH/2, 20, text="0", font=("Arial", 15), fill="black")
+high_scoreLabel =canvas.create_text(SCREEN_WIDTH/2, 40, text="", font=("Arial", 10), fill="black")
 
 # bind
 window.bind("<Up>", MoveUp)
